@@ -1,11 +1,12 @@
 import time, threading
 
-if __name__ == '__main__':
-    def task(i):
-        print(f"Task {i} starts")
-        time.sleep(1)
-        print(f"Task {i} ends")
 
+def task(i):
+    print(f"Task {i} starts")
+    time.sleep(1)
+    print(f"Task {i} ends")
+
+if __name__ == '__main__':
     start = time.perf_counter()
 
     T = []
