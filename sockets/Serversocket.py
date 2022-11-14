@@ -1,17 +1,23 @@
-import socket, sys
+import socket
 
-def server():
-    reply = input('ffff')
-    host = '127.0.0.1'
-    port = 10000
+
+def server_program():
+    host = socket.gethostname()
+    port = 5000
+
     server_socket = socket.socket()
     server_socket.bind((host, port))
-    server_socket.listen(10)
+    server_socket.listen(2)
     conn, address = server_socket.accept()
-    data = conn.recv(1024).decode()
-    print(data)
-    conn.send(reply.encode())
+    print("Connection from: " + str(address))
+    while True:
+        data = conn.recv(1024).decode()
+        if not data:
+            break
+        print("from connected user: " + str(data))
+        data = input('> ')
+        conn.send(data.encode())
     conn.close()
 
 if __name__ == '__main__':
-    sys.exit(server())
+    server_program()
