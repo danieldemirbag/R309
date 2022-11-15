@@ -2,22 +2,28 @@ import socket
 
 
 def server_program():
-    host = socket.gethostname()
+    host = "127.0.0.1"
     port = 5000
 
-    server_socket = socket.socket()
-    server_socket.bind((host, port))
-    server_socket.listen(2)
-    conn, address = server_socket.accept()
-    print("Connection from: " + str(address))
-    while True:
-        data = conn.recv(1024).decode()
-        if not data:
-            break
-        print("from connected user: " + str(data))
-        data = input('> ')
-        conn.send(data.encode())
-    conn.close()
+    msgcl = msgsrv = ""
+    server = socket.socket()
+    server.bind((host, port))
+    server.listen(2)
+    while msgcl != "arret" and msgsrv != "arret":
+        conn, address = server.accept()
+        msgcl = msgsrv = ""
+        while msgcl != "bye" and msgsrv != "bye" and msgcl != "arret" and msgsrv != "arret":
+            msgcl = conn.recv(1024).decode()
+            print(f"Message recu : {msgcl}")
+            if msgcl == "bye":
+                conn.send("bye".encode())
+            elif msgcl == "arret":
+                conn.send("arret".encode())
+            else:
+                msgsrv = input("> ")
+                conn.send(msgsrv.encode())
+        conn.close()
+    server.close()
 
 if __name__ == '__main__':
     server_program()
