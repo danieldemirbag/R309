@@ -7,7 +7,7 @@ def client_program():
 
     client = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
     client.connect((host, port))
-    msgcl = msgsrv = ""
+    msgcl = msgsrv = "> "
     while msgcl != "bye" and msgsrv != "bye" and msgcl != "arret" and msgsrv != "arret":
         msgcl = input("> ")
         client.send(msgcl.encode())
