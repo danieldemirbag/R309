@@ -1,11 +1,11 @@
-import socket
-
+import socket, threading
+from _thread import *
 
 def client_program():
     host = "127.0.0.1"
-    port = 5000
+    port = 10000
 
-    client = socket.socket()
+    client = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
     client.connect((host, port))
     msgcl = msgsrv = ""
     while msgcl != "bye" and msgsrv != "bye" and msgcl != "arret" and msgsrv != "arret":
