@@ -1,4 +1,4 @@
-import socket
+import socket, threading
 
 
 def server_program():
@@ -26,4 +26,10 @@ def server_program():
     server.close()
 
 if __name__ == '__main__':
-    server_program()
+    t1 = threading.Thread(target=server_program())
+    t1.start()
+    t2 = threading.Thread(target=server_program())
+    t2.start()
+
+    t1.join()  # j'attends la fin de la thread
+    t2.join()  # j'attends la fin de la thread
