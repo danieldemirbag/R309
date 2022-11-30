@@ -1,5 +1,7 @@
 import sys
 from PyQt5.QtWidgets import *
+from client import *
+from server import *
 
 class MainWindow(QMainWindow):
     def __init__(self):
