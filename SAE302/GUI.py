@@ -80,10 +80,10 @@ class MainWindow(QMainWindow):
 
         if state:
             self.setStyleSheet("background-color: gray;")
-            self.__textIP.setStyleSheet("background-color: white;")
+            """self.__textIP.setStyleSheet("background-color: white;")
             self.__textPORT.setStyleSheet("background-color: white;")
             self.__list.setStyleSheet("background-color: white;")
-            """self.__bouton.setStyleSheet("background-color: white;")
+            self.__bouton.setStyleSheet("background-color: white;")
             self.__envoyer.setStyleSheet("background-color: white;")
             self.__lab.setStyleSheet("background-color: white;")"""
         else:
