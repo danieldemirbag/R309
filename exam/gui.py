@@ -1,15 +1,17 @@
 from PyQt5 import QtGui, QtCore
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
-from client import *
 from PyQt5.QtGui import *
-from server import *
-import sys
+import sys, socket, threading
 
 
-class MainWindow(QMainWindow):
-    def __init__(self):
+class MainWindow(QMainWindow, threading.Thread):
+    def __init__(self): # j'ai essayé (self, host, port)
         super().__init__()
+        """self.__textIP = host
+        self.__textPORT = port
+        """
+        self.__sock = socket.socket()
 
         self.initUI()
         self.setWindowTitle("Gestionnaire de serveur")
@@ -17,40 +19,53 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(widget)
         grid = QGridLayout()
         widget.setLayout(grid)
-        self.__list = QComboBox(self)
 
-        self.__labIP = QLabel("IP :")
+
+        self.__labIP = QLabel("Serveur")
         self.__textIP = QLineEdit("")
-        self.__labPORT = QLabel("PORT :")
+        self.__labPORT = QLabel("Port")
         self.__textPORT = QLineEdit("")
-        self.__list = QComboBox()
-        self.__list.addItem("Choisir une commande")
-        self.__list.addItem("OS")
-        self.__list.addItem("RAM")
-        self.__list.addItem("CPU")
-        self.__list.addItem("IP")
-        self.__list.addItem("Name")
-        self.__list.addItem("Disconnect")
-        self.__list.addItem("Kill")
-        self.__list.addItem("Reset")
-        self.__bouton = QPushButton("?")
-        self.__envoyer = QPushButton("Envoyer")
-        self.__lab = QLabel("Choisir une commande")
-        self.__labcmd = QLabel("CMD :")
+        self.__boutoncon = QPushButton("Connexion")
+        self.__labmsg = QLabel("Message : ")
+        self.__textmsg = QLineEdit("")
+        self.__boutonsend = QPushButton("Envoyer")
+        self.__boutonseff = QPushButton("Effacer")
 
         grid.addWidget(self.__labIP, 0, 0)
         grid.addWidget(self.__textIP, 0, 1)
-        grid.addWidget(self.__labPORT, 0, 2)
-        grid.addWidget(self.__textPORT, 0, 3)
-        grid.addWidget(self.__labcmd, 1, 0)
-        grid.addWidget(self.__list, 1, 1, 1, 3)
-        grid.addWidget(self.__envoyer, 2, 0, 1, 4)
-        grid.addWidget(self.__lab, 3, 0, 1, 4)
-        grid.addWidget(self.__bouton, 4, 3)
+        grid.addWidget(self.__labPORT, 1, 0)
+        grid.addWidget(self.__textPORT, 1, 1)
+        grid.addWidget(self.__boutoncon, 2, 0, 1, 2)
+        grid.addWidget(self.__labmsg, 4, 0)
+        grid.addWidget(self.__textmsg, 4, 1)
+        grid.addWidget(self.__boutonsend, 5, 0, 1, 2)
+        grid.addWidget(self.__boutonseff, 6, 0, 1, 2)
 
-        self.__list.activated.connect(self._actionchanger)
-        '''envoyer.clicked.connect(self.)'''
-        self.__bouton.clicked.connect(self._messagebox)
+        self.__boutoncon.clicked.connect(self._actionCon)
+
+
+    def _actionCon(self) -> int:
+        if self.__textIP.currentText() == "localhost" and self.__textPORT.currentText() == 10000:
+            try:
+                """self.__sock.connect((self.__host, self.__port))"""
+                self.__sock.connect((self.__textIP, self.__textPORT))
+            except ConnectionRefusedError:
+                print("serveur non lancé ou mauvaise information")
+                return -1
+            except ConnectionError:
+                print("erreur de connection")
+                return -1
+            else:
+                print("connexion réalisée")
+                return 0
+    def __dialogue(self):
+        msg = ""
+        while msg != "kill" and msg != "disconnect" and msg != "reset":
+            msg = input("client: ")
+            self.__sock.send(msg.encode())
+            msg = self.__sock.recv(1024).decode()
+        self.__sock.close()
+
 
     def initUI(self):
 
@@ -95,11 +110,7 @@ class MainWindow(QMainWindow):
     def _actionchanger(self):
         self.__lab.setText(self.__list.currentText() + " : ")
 
-    def _messagebox(self):
-        msg = QMessageBox()
-        msg.setWindowTitle("Aide")
-        msg.setText("Cette application permet d'envoyer des commandes à un serveur")
-        msg.exec_()
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
