@@ -68,7 +68,7 @@ class MainWindow(QMainWindow):
         fileMenu.addAction(exitAct)
         viewMenu = menubar.addMenu('Affichage')
 
-        viewStatAct = QAction('Theme', self, checkable=True)
+        viewStatAct = QAction('Theme', self, checkable = True)
         viewStatAct.setShortcut('Ctrl+N')
         viewStatAct.setStatusTip('Theme')
         viewStatAct.setChecked(False)
