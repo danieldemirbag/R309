@@ -20,7 +20,7 @@ def server_program():
             elif msgcl == "arret":
                 conn.send("arret".encode())
             else:
-                msgsrv = input("> ")
+                msgsrv = input("")
                 conn.send(msgsrv.encode())
         conn.close()
     server.close()
