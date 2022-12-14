@@ -1,4 +1,6 @@
-import socket,platform,subprocess
+import socket, platform ,subprocess, os
+import psutil as psutil
+
 
 def serveur():
     msg = ""
@@ -27,13 +29,18 @@ def serveur():
                     msg = conn.recv(1024).decode()
                     print ("Received from client: ", msg)
                     if msg == "OS":
-                        msg = subprocess.getoutput('systeminfo | findstr /C:"Nom du système d’exploitation:"')
-                        msg2 = subprocess.getoutput('systeminfo | findstr /C:"Version du système:"')
-                        conn.send(msg.encode())
-                        conn.send(msg2.encode())
-
-
-                    # msg = input('Enter a message to send: ')
+                        msg = subprocess.getoutput('systeminfo | findstr /C:"Nom du système d’exploitation:"') + '\n' + subprocess.getoutput('systeminfo | findstr /C:"Version du système:"')
+                    elif msg == "RAM":
+                        msgRAM = psutil.virtual_memory().total / 1000000000
+                        msgRAM1 = psutil.virtual_memory().available * 100 / psutil.virtual_memory().total
+                        msgRAM2 = psutil.virtual_memory().percent
+                        msg = (f'RAM : {round(msgRAM, 1)} Go | RAM utilisée {round(msgRAM2)} % | RAM disponible : {round(msgRAM1)} %')
+                    elif msg == "CPU":
+                        msg = (f'Utilisation du CPU : {psutil.cpu_percent()} %')
+                    elif msg == "IP":
+                        msg = subprocess.getoutput('ipconfig | findstr /i "Adresse IPv4"')
+                    elif msg == "Name":
+                        msg = subprocess.getoutput('hostname')
                     """ 
                     le serveur va ici récupere les commandes du client et lui renvoyer. Dans la suite de la SAÉ, 
                     le serveur fera pareil mais en renvoyant le résultat des commandes demandées par le client.

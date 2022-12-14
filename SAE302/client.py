@@ -31,7 +31,9 @@ class Client(threading.Thread):
             msg = input("client: ")
             self.__sock.send(msg.encode())
             msg = self.__sock.recv(1024).decode()
+            #msg2 = self.__sock.recv(1024).decode()
             print(msg)
+            #print(msg2)
 
 
 
