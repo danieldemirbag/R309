@@ -1,10 +1,10 @@
-import socket
+import socket,platform,subprocess
 
 def serveur():
     msg = ""
     conn = None
     server_socket = None
-    while msg != "kill" :
+    while msg != "kill":
         msg = ""
         server_socket = socket.socket()
         """ options qui permette de réutiliser l'adresse et le port rapidement"""
@@ -16,7 +16,7 @@ def serveur():
         print('Serveur en attente de connexion')
         while msg != "kill" and msg != "reset":
             msg = ""
-            try :
+            try:
                 conn, addr = server_socket.accept()
                 print (addr)
             except ConnectionError:
@@ -26,6 +26,13 @@ def serveur():
                 while msg != "kill" and msg != "reset" and msg != "disconnect":
                     msg = conn.recv(1024).decode()
                     print ("Received from client: ", msg)
+                    if msg == "OS":
+                        msg = subprocess.getoutput('systeminfo | findstr /C:"Nom du système d’exploitation:"')
+                        msg2 = subprocess.getoutput('systeminfo | findstr /C:"Version du système:"')
+                        conn.send(msg.encode())
+                        conn.send(msg2.encode())
+
+
                     # msg = input('Enter a message to send: ')
                     """ 
                     le serveur va ici récupere les commandes du client et lui renvoyer. Dans la suite de la SAÉ, 
