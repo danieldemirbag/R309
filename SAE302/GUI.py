@@ -1,12 +1,44 @@
 from PyQt5 import QtGui, QtCore
 from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
-from client import *
 from PyQt5.QtGui import *
-from server import *
-import sys
+import sys, socket, threading
 
+class Client(threading.Thread):
 
+    def __init__(self, host, port):
+        super().__init__()
+        self.__host = host
+        self.__port = port
+        self.__sock = socket.socket()
+    def __connect(self) -> int:
+        try :
+            self.__sock.connect((self.__host,self.__port))
+        except ConnectionRefusedError:
+            print ("serveur non lancé ou mauvaise information")
+            return -1
+        except ConnectionError:
+            print ("erreur de connection")
+            return -1
+        else :
+            print ("connexion réalisée")
+            return 0
+    # méthode de dialogue synchrone
+    def __dialogue(self):
+        msg = ""
+        try:
+            while msg != "kill" and msg != "disconnect" and msg != "reset":
+                msg = input("client: ")
+                self.__sock.send(msg.encode())
+                msg = self.__sock.recv(1024).decode()
+                print(msg)
+        except:
+            print('Serveur deconnecté !')
+            self.__sock.close()
+
+    def run(self):
+        if (self.__connect() ==0):
+            self.__dialogue()
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
