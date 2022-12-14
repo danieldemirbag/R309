@@ -11,7 +11,6 @@ class Client(threading.Thread):
         self.__host = host
         self.__port = port
         self.__sock = socket.socket()
-    #méthode de connection
     def __connect(self) -> int:
         try :
             self.__sock.connect((self.__host,self.__port))
@@ -27,18 +26,15 @@ class Client(threading.Thread):
     # méthode de dialogue synchrone
     def __dialogue(self):
         msg = ""
-        while msg != "kill" and msg != "disconnect" and msg != "reset":
-            msg = input("client: ")
-            self.__sock.send(msg.encode())
-            msg = self.__sock.recv(1024).decode()
-            #msg2 = self.__sock.recv(1024).decode()
-            print(msg)
-            #print(msg2)
-
-
-
-        self.__sock.close()
-
+        try:
+            while msg != "kill" and msg != "disconnect" and msg != "reset":
+                msg = input("client: ")
+                self.__sock.send(msg.encode())
+                msg = self.__sock.recv(1024).decode()
+                print(msg)
+        except:
+            print("Deconnecté")
+            self.__sock.close()
 
     def run(self):
         if (self.__connect() ==0):
