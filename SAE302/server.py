@@ -20,7 +20,7 @@ def serveur():
             msg = ""
             try:
                 conn, addr = server_socket.accept()
-                print (addr)
+                print(addr)
             except ConnectionError:
                 print ("erreur de connection")
                 break
@@ -41,8 +41,7 @@ def serveur():
                         msg = "Les IP disponible sur le server sont : \n" + subprocess.getoutput('ipconfig | findstr /i "Adresse IPv4"')
                     elif msg == "Name":
                         msg = 'Le nom de la machine est : ' + subprocess.getoutput('hostname')
-                    else:
-                        msg = "Veuillez entrer une commande valide"
+
                     """ 
                     le serveur va ici récupere les commandes du client et lui renvoyer. Dans la suite de la SAÉ, 
                     le serveur fera pareil mais en renvoyant le résultat des commandes demandées par le client.

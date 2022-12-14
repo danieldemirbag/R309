@@ -33,7 +33,7 @@ class Client(threading.Thread):
                 msg = self.__sock.recv(1024).decode()
                 print(msg)
         except:
-            print("Deconnecté")
+            print('Serveur deconnecté !')
             self.__sock.close()
 
     def run(self):
