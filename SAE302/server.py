@@ -34,13 +34,15 @@ def serveur():
                         msgRAM = psutil.virtual_memory().total / 1000000000
                         msgRAM1 = psutil.virtual_memory().available * 100 / psutil.virtual_memory().total
                         msgRAM2 = psutil.virtual_memory().percent
-                        msg = (f'RAM : {round(msgRAM, 1)} Go | RAM utilisée {round(msgRAM2)} % | RAM disponible : {round(msgRAM1)} %')
+                        msg = (f'RAM : {round(msgRAM)} Go | RAM utilisée : {round(msgRAM2)} % | RAM disponible : {round(msgRAM1)} %')
                     elif msg == "CPU":
                         msg = (f'Utilisation du CPU : {psutil.cpu_percent()} %')
                     elif msg == "IP":
-                        msg = subprocess.getoutput('ipconfig | findstr /i "Adresse IPv4"')
+                        msg = "Les IP disponible sur le server sont : \n" + subprocess.getoutput('ipconfig | findstr /i "Adresse IPv4"')
                     elif msg == "Name":
-                        msg = subprocess.getoutput('hostname')
+                        msg = 'Le nom de la machine est : ' + subprocess.getoutput('hostname')
+                    else:
+                        msg = "Veuillez entrer une commande valide"
                     """ 
                     le serveur va ici récupere les commandes du client et lui renvoyer. Dans la suite de la SAÉ, 
                     le serveur fera pareil mais en renvoyant le résultat des commandes demandées par le client.
