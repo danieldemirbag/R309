@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 import sys, socket, threading
 
-list = ['Choisir une commande','OS', 'RAM', 'CPU', 'IP', 'Name', 'Disconnect', 'kill', 'reset']
+list = ['Choisir une commande','OS', 'RAM', 'CPU', 'IP', 'Name', 'disconnect', 'kill', 'reset']
 
 class Client(threading.Thread):
 
@@ -37,9 +37,14 @@ class Client(threading.Thread):
                 self.__sock.send(msg.encode())
                 msg = self.__sock.recv(1024).decode()
                 print(msg)
+                return(msg)
         except:
             print('Serveur deconnecté !')
             self.__sock.close()
+    def send_message(self, msg):
+        self.__sock.send(msg.encode())
+        rep = self.__sock.recv(8192).decode()
+        return rep
 
     def run(self):
         if (self.connect() ==0):
@@ -47,7 +52,7 @@ class Client(threading.Thread):
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-
+        self.__listWidget = QListWidget()
         self.initUI()
         self.setWindowTitle("Gestionnaire de serveur")
         widget = QWidget()
@@ -59,7 +64,7 @@ class MainWindow(QMainWindow):
         self.__labIP = QLabel("IP :")
         self.__textIP = QLineEdit("")
         self.__labPORT = QLabel("PORT :")
-        self.__textPORT = QLineEdit("")
+        self.__textPORT = QLineEdit("10013")
         self.__IPlist = QComboBox()
         self.__list = QComboBox()
         for x in list:
@@ -70,24 +75,40 @@ class MainWindow(QMainWindow):
         self.__lab = QTextEdit()
         self.__etat = QLabel("Déconnecté")
         self.__labcmd = QLabel("CMD :")
+        self.__openButton = QPushButton("Ouvrir un fichier")
+        layout = QVBoxLayout()
+        layout.addWidget(self.__listWidget)
+        layout.addWidget(self.__openButton)
+        widget.setLayout(layout)
 
-        grid.addWidget(self.__labIP, 0, 0)
-        grid.addWidget(self.__textIP, 0, 1)
-        grid.addWidget(self.__labPORT, 0, 2)
-        grid.addWidget(self.__textPORT, 0, 3)
-        grid.addWidget(self.__labcmd, 1, 0)
-        grid.addWidget(self.__list, 1, 1, 1, 3)
-        grid.addWidget(self.__envoyer, 2, 0, 1, 4)
-        grid.addWidget(self.__etat, 3, 0, 1, 4)
-        grid.addWidget(self.__lab, 4, 0, 1, 4)
-        grid.addWidget(self.__connecter, 5, 0)
-        grid.addWidget(self.__bouton, 5, 3)
+        grid.addWidget(self.__openButton, 0, 0, 1, 4)
+        grid.addWidget(self.__listWidget, 1, 0, 1, 4)
+        grid.addWidget(self.__labIP, 2, 0)
+        grid.addWidget(self.__textIP, 2, 1)
+        grid.addWidget(self.__labPORT, 2, 2)
+        grid.addWidget(self.__textPORT, 2, 3)
+        grid.addWidget(self.__labcmd, 4, 0)
+        grid.addWidget(self.__connecter, 3, 0, 1, 4)
+        grid.addWidget(self.__list, 4, 1, 1, 3)
+        grid.addWidget(self.__etat, 5, 0, 1, 4)
+        grid.addWidget(self.__lab, 6, 0, 1, 4)
+        grid.addWidget(self.__envoyer, 7, 0)
+        grid.addWidget(self.__bouton, 7, 3)
 
-        self.__list.activated.connect(self._actionchanger)
+
+        '''self.__list.activated.connect(self._actionchanger)'''
         '''envoyer.clicked.connect(self.)'''
         self.__bouton.clicked.connect(self._messagebox)
         self.__connecter.clicked.connect(self.connection)
-        #self.__envoyer.clicked.connect(self.message)
+        self.__envoyer.clicked.connect(self.envoi_message)
+        self.__openButton.clicked.connect(self.openFile)
+
+    def openFile(self):
+        fileName, _ = QFileDialog.getOpenFileName()
+        if fileName:
+            with open(fileName, "r") as f:
+                for line in f:
+                    self.__listWidget.addItem(line)
 
     def initUI(self):
 
@@ -129,8 +150,8 @@ class MainWindow(QMainWindow):
         else:
             self.setStyleSheet("background-color: light gray;")
 
-    def _actionchanger(self):
-        self.__lab.setText(self.__list.currentText())
+    '''def _actionchanger(self):
+        self.__lab.setText(self.__list.currentText())'''
 
     def _messagebox(self):
         msg = QMessageBox()
@@ -150,6 +171,22 @@ class MainWindow(QMainWindow):
         else:
             self.__etat.setText('Connecté')
 
+    def envoi_message(self):
+        if self.__etat.text() == 'Connecté':
+            msg = self.__list.currentText()
+            try:
+                self.__lab.append(msg)
+                self.conn.send_message(msg)
+                self.__lab.append(self.conn.send_message(msg))
+                if msg == 'disconnect' and msg == 'kill' and msg == 'reset':
+                    self.__etat.setText('Déconnecté')
+            except:
+                pass
+        else:
+            msg2 = QMessageBox()
+            msg2.setWindowTitle('Erreur')
+            msg2.setText('Erreur de connexion')
+            msg2.exec_()
 
 
 if __name__ == '__main__':

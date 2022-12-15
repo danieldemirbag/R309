@@ -12,7 +12,7 @@ def serveur():
         """ options qui permette de réutiliser l'adresse et le port rapidement"""
         server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 # l'adresse 0.0.0.0 permet d'écouter toutes les IP de la machine, localhost, locale comme publique
-        server_socket.bind(("0.0.0.0", 15001))
+        server_socket.bind(("0.0.0.0", 10013))
 
         server_socket.listen(1)
         print('Serveur en attente de connexion')
