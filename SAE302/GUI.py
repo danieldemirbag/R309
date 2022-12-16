@@ -14,7 +14,7 @@ class Client(threading.Thread):
         self.__port = port
         self.__sock = socket.socket()
     def connect(self) -> int:
-        try :
+        try:
             self.__sock.connect((self.__host,self.__port))
         except ConnectionRefusedError:
             msg2 = QMessageBox()
@@ -30,22 +30,20 @@ class Client(threading.Thread):
             return 0
     # méthode de dialogue synchrone
     def dialogue(self):
-        msg = ""
         try:
-            while msg != "kill" and msg != "disconnect" and msg != "reset":
-                msg = input("client: ")
-                self.__sock.send(msg.encode())
-                msg = self.__sock.recv(1024).decode()
-                print(msg)
-                return(msg)
+            msg = input("client: ")
+            self.__sock.send(msg.encode())
+            msg = self.__sock.recv(1024).decode()
+            return(msg)
         except:
             print('Serveur deconnecté !')
             self.__sock.close()
-    def send_message(self, msg):
+    def message(self, msg):
         self.__sock.send(msg.encode())
-        rep = self.__sock.recv(8192).decode()
+        rep = self.__sock.recv(1024).decode()
         return rep
-
+    def deco(self):
+        socket.socket.close()
     def run(self):
         if (self.connect() ==0):
             self.dialogue()
@@ -64,7 +62,7 @@ class MainWindow(QMainWindow):
         self.__labIP = QLabel("IP :")
         self.__textIP = QLineEdit("")
         self.__labPORT = QLabel("PORT :")
-        self.__textPORT = QLineEdit("10013")
+        self.__textPORT = QLineEdit("10014")
         self.__IPlist = QComboBox()
         self.__list = QComboBox()
         for x in list:
@@ -169,17 +167,24 @@ class MainWindow(QMainWindow):
             msg2.setText('Erreur de connexion')
             msg2.exec_()
         else:
+            self.__connecter.setEnabled(False)
+            self.__connecter.show()
             self.__etat.setText('Connecté')
 
     def envoi_message(self):
         if self.__etat.text() == 'Connecté':
             msg = self.__list.currentText()
             try:
-                self.__lab.append(msg)
-                self.conn.send_message(msg)
-                self.__lab.append(self.conn.send_message(msg))
                 if msg == 'disconnect' and msg == 'kill' and msg == 'reset':
                     self.__etat.setText('Déconnecté')
+                    self.__connecter.setEnabled(True)
+                    self.__connecter.show()
+                    self.conn.deco()
+                    self.__lab.setText('Deconnécté')
+                else:
+                    self.__lab.append(msg)
+                    self.conn.message(msg)
+                    self.__lab.append(self.conn.message(msg))
             except:
                 pass
         else:
