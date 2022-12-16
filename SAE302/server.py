@@ -9,11 +9,8 @@ def serveur():
     while msg != "kill":
         msg = ""
         server_socket = socket.socket()
-        """ options qui permette de réutiliser l'adresse et le port rapidement"""
         server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-# l'adresse 0.0.0.0 permet d'écouter toutes les IP de la machine, localhost, locale comme publique
         server_socket.bind(("0.0.0.0", 10014))
-
         server_socket.listen(1)
         print('Serveur en attente de connexion')
         while msg != "kill" and msg != "reset":
@@ -29,7 +26,8 @@ def serveur():
                     msg = conn.recv(1024).decode()
                     print ("Received from client: ", msg)
                     if msg == "OS":
-                        msg = subprocess.getoutput('systeminfo | findstr /C:"Nom du système d’exploitation:"') + '\n' + subprocess.getoutput('systeminfo | findstr /C:"Version du système:"')
+                        msg = subprocess.getoutput('systeminfo | findstr /C:"Nom du système d’exploitation:"') + \
+                              '\n' + subprocess.getoutput('systeminfo | findstr /C:"Version du système:"')
                     elif msg == "RAM":
                         msgRAM = psutil.virtual_memory().total / 1000000000
                         msgRAM1 = psutil.virtual_memory().available * 100 / psutil.virtual_memory().total
@@ -41,18 +39,11 @@ def serveur():
                         msg = "Les IP disponible sur le server sont : \n" + subprocess.getoutput('ipconfig | findstr /i "Adresse IPv4"')
                     elif msg == "Name":
                         msg = 'Le nom de la machine est : ' + subprocess.getoutput('hostname')
-
-                    """ 
-                    le serveur va ici récupere les commandes du client et lui renvoyer. Dans la suite de la SAÉ, 
-                    le serveur fera pareil mais en renvoyant le résultat des commandes demandées par le client.
-                    """
                     conn.send(msg.encode())
                 conn.close()
         print ("Connection closed")
         server_socket.close()
         print ("Server closed")
-
-# Coder les commande ici
 
 if __name__ == '__main__':
     serveur()
